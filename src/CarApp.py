@@ -21,13 +21,16 @@ import requests
 
 class GoogleDistance:
 
+	# GoogleDistance Constructor
 	def __init__(self):
 		self.key = "AIzaSyBC3pRZztlHawOAlqrqPex-UxWfbqP4Dhg"
 		self.payload = {}
 		self.headers = {"Accept":"application/json"}
 		self.getUserTripPath()
-		
-
+	
+	##
+	## getUserTripPath: Gets the user inputted Origin, Destination, and highway preferences. Saves as class variable.
+	##
 	def getUserTripPath(self):
 		self.origin = input("Enter starting location (city or address): ")
 		self.destination = input("Enter destination location (city or address): ")
@@ -39,7 +42,9 @@ class GoogleDistance:
 		else:
 			self.avoidHighways = False
 
+	##
 	## MakeGetRequest: Returns response of GET request for given URL
+	##
 	def MakeGetRequest(self,URL):
 		return requests.request("GET", URL, headers=self.headers, data=self.payload)
 
@@ -70,17 +75,23 @@ class GoogleDistance:
 
 class FuelEconomy:
 
+	# Fuel Economy Constructor
 	def __init__(self):
 		self.payload = {}
 		self.headers = {"Accept":"application/json"}
 		self.getUserCarModel()
 
+	##
+	## getUserCarModel: Gets User input for car model, make, year. Saves as class variable
+	##
 	def getUserCarModel(self):
 		self.make = input("Enter the make of your car (Example: Honda): ")
 		self.model = input("Enter the model of your car (Example: Fit): ")
 		self.year = input("Enter the year of your car: ")
 
+	##
 	## MakeGetRequest: Returns response of GET request for given URL
+	##
 	def MakeGetRequest(self,URL):
 		return requests.request("GET", URL, headers=self.headers, data=self.payload)
 
@@ -126,6 +137,10 @@ class FuelEconomy:
 		
 		return response.json()['avgMpg']
 
+
+###
+### getAPIData: Returns the data from Google and FuelEconomy needed to calculate the total price of a trip
+###
 def getAPIData():
 
 	googleDistance = GoogleDistance()
@@ -158,6 +173,9 @@ def getAPIData():
 
 	return distance, float(avgMPG), float(fuelPrice)
 
+##
+## calulatePrice: Calculates the price of the trip given distance (miles), avg miles/gallon, and fuel price per gallon
+##
 def calculatePrice(distance, avgMPG, fuelPrice):
 
 	gallons = distance/avgMPG
@@ -167,9 +185,7 @@ def calculatePrice(distance, avgMPG, fuelPrice):
 
 
 def main(): 
-
 	distance, avgMPG, fuelPrice = getAPIData()
 	print("The total price of your trip is: $" + "{:.2f}".format(calculatePrice(distance, avgMPG, fuelPrice)))
-
 
 main()
