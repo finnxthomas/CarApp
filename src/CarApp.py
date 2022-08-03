@@ -31,6 +31,13 @@ class GoogleDistance:
 	def getUserTripPath(self):
 		self.origin = input("Enter starting location (city or address): ")
 		self.destination = input("Enter destination location (city or address): ")
+		
+		highwayAnswer = input("Avoid highways? Enter Yes or No: ").lower()
+
+		if ((highwayAnswer == 'y') or (highwayAnswer == 'yes')):
+			self.avoidHighways = True
+		else:
+			self.avoidHighways = False
 
 	## MakeGetRequest: Returns response of GET request for given URL
 	def MakeGetRequest(self,URL):
@@ -39,18 +46,21 @@ class GoogleDistance:
 	##
 	## CreateURL: Returns the Google Distance URL for http get request given origin and destination
 	##
-	def CreateURL(self, origin, destination):
+	def CreateURL(self):
 
 		base = "https://maps.googleapis.com/maps/api/distancematrix/json?"
-		directions = "origins=" + origin + "&destinations=" + destination
+		directions = "origins=" + self.origin + "&destinations=" + self.destination
 		end = "&units=imperial&key=" + self.key
-		
-		return base + directions + end
+
+		if (self.avoidHighways):
+			return base + directions + end + "&avoid=highways"
+		else:
+			return base + directions + end
 		
 	## GetDistance: Does http request and returns distance from origin to destination
 	##
-	def GetDistance(self, origin, destination):
-		url = self.CreateURL(origin, destination)
+	def GetDistance(self):
+		url = self.CreateURL()
 
 		response = self.MakeGetRequest(url)
 		distanceInMeters = response.json()['rows'][0]['elements'][0]['distance']['value']
@@ -77,9 +87,9 @@ class FuelEconomy:
 	##
 	## GetCarID: Returns carID of a make, model, and year for user to choose from
 	##
-	def GetCarID(self, make, model, year):
+	def GetCarID(self):
 
-		carDescription = "year=" + year + "&make=" + make + "&model=" + model
+		carDescription = "year=" + self.year + "&make=" + self.make + "&model=" + self.model
 		URL = "https://www.fueleconomy.gov/ws/rest/vehicle/menu/options?" + carDescription
 		
 		response = self.MakeGetRequest(URL)
@@ -123,7 +133,7 @@ def getAPIData():
 	# Get the origin and destination from the user, and make sure it is valid
 	while True:
 		try:
-			distance = googleDistance.GetDistance(googleDistance.origin, googleDistance.destination)
+			distance = googleDistance.GetDistance()
 			break
 		except:
 			print("Your origin or destination could not be found")
@@ -135,7 +145,7 @@ def getAPIData():
 	# Get the car type from the user, making sure it is valid
 	while True:
 		try:
-			carID = fuelEconomy.GetCarID(fuelEconomy.make, fuelEconomy.model, fuelEconomy.year)
+			carID = fuelEconomy.GetCarID()
 			break
 		except:
 			print("Your car model was not found")
@@ -160,8 +170,6 @@ def main():
 
 	distance, avgMPG, fuelPrice = getAPIData()
 	print("The total price of your trip is: $" + "{:.2f}".format(calculatePrice(distance, avgMPG, fuelPrice)))
-
-
 
 
 main()
