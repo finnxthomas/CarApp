@@ -23,7 +23,7 @@ class GoogleDistance:
 
 	# GoogleDistance Constructor
 	def __init__(self):
-		self.key = "AIzaSyBC3pRZztlHawOAlqrqPex-UxWfbqP4Dhg"
+		self.key = input("Submit Google API key: ")
 		self.payload = {}
 		self.headers = {"Accept":"application/json"}
 		self.getUserTripPath()
@@ -184,7 +184,7 @@ def calculatePrice(distance, avgMPG, fuelPrice):
 	return price
 
 
-def main(): 
+def main():
 	distance, avgMPG, fuelPrice = getAPIData()
 	print("The total price of your trip is: $" + "{:.2f}".format(calculatePrice(distance, avgMPG, fuelPrice)))
 
